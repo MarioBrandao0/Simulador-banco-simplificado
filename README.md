@@ -8,8 +8,8 @@ Este é um projeto pessoal de estudo, criado para praticar conceitos de back-end
 > Projeto em desenvolvimento. Funcionalidades e entidades ainda estão sendo implementadas.
 
 ## Funcionalidades planejadas
-- [ ] Cadastro de usuários comuns e lojistas
-- [ ] Validação de CPF e e-mails únicos
+- [X] Cadastro de usuários comuns e lojistas
+- [X] Validação de CPF e e-mails únicos
 - [ ] Transferência de dinheiro entre usuários
 - [ ] Restrição: lojistas apenas recebem, não enviam dinheiro
 - [ ] Consulta a um serviço externo de autorização antes de concluir a transferência
@@ -25,7 +25,9 @@ Este é um projeto pessoal de estudo, criado para praticar conceitos de back-end
 - Em caso de inconsistência, a operação é revertida por completo
 
 ## Status do projeto
-Em desenvolvimento — modelagem inicial das entidades.
+Em desenvolvimento — Tranferencia de dinheiro entre usuários junto com a restrição dos lojistas.
+
+Feito - Criação e listagem de usuários.
 
 ## Como rodar
 Calma, jovem Padawan. Ainda estou desenvolvendo — esse é só o commit inicial.
