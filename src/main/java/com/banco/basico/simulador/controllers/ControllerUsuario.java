@@ -1,6 +1,7 @@
 package com.banco.basico.simulador.controllers;
 
 import com.banco.basico.simulador.domain.Usuario;
+import com.banco.basico.simulador.dto.DtoResponseUsuario;
 import com.banco.basico.simulador.dto.DtoUsuario;
 import com.banco.basico.simulador.services.ServiceUsuario;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ public class ControllerUsuario {
 
     @GetMapping("/listar")
     public ResponseEntity<?> listarTodos() {
-        List<Usuario> listaDeUsuarios = serviceUsuario.listarTodos();
+        List<DtoResponseUsuario> listaDeUsuarios = serviceUsuario.listarTodos();
         return ResponseEntity.status(HttpStatus.OK).body(listaDeUsuarios);
     }
 

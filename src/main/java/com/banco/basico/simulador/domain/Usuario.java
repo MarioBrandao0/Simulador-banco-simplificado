@@ -15,6 +15,7 @@ public class Usuario {
     String email;
     String senha;
     TipoUsuario tipoUsuario;
+    Carteira carteira;
 
     public Usuario(String cpf, String nome, String email, String senha, TipoUsuario tipoUsuario) {
         this.id = UUID.randomUUID();
@@ -23,6 +24,10 @@ public class Usuario {
         this.email = email;
         this.senha = senha;
         this.tipoUsuario = tipoUsuario;
+    }
+
+    public void inserirCarteira(Carteira carteira){
+        this.carteira = carteira;
     }
 
     @Override
