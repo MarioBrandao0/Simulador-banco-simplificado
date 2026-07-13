@@ -6,14 +6,18 @@ import com.banco.basico.simulador.dto.DtoResponseUsuario;
 import com.banco.basico.simulador.dto.DtoUsuario;
 import com.banco.basico.simulador.exceptions.CpfExistenteException;
 import com.banco.basico.simulador.exceptions.EmailExistenteException;
+import com.banco.basico.simulador.exceptions.UsuarioNaoEncontradoException;
 import com.banco.basico.simulador.repositorys.RepositorioCarteira;
 import com.banco.basico.simulador.repositorys.RepositorioUsuario;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class ServiceUsuario {
@@ -22,6 +26,17 @@ public class ServiceUsuario {
 
     @Autowired
     RepositorioCarteira repositorioCarteira;
+
+    public Optional<Usuario> buscarUsuario(UUID idRemetente) {
+        return Optional.ofNullable(repositorioUsuario.buscarUsuario(idRemetente)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Remetente não encontrado")));
+
+    }
+
+    public Optional<Usuario> buscarUsuarioPorCpf(String chavePixDestinatario) {
+        return Optional.ofNullable(repositorioUsuario.buscarUsuarioPorCpf(chavePixDestinatario)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Destinatário não encontrado")));
+    }
 
 
     private void emailExiste(String email) throws EmailExistenteException {
@@ -39,6 +54,7 @@ public class ServiceUsuario {
         }
     }
 
+    @CacheEvict(value = "todosOsUsuarios", allEntries = true)
     public void salvarUsuario(DtoUsuario dtoUsuario) {
         emailExiste(dtoUsuario.email());
         cpfExiste(dtoUsuario.cpf());
@@ -53,6 +69,7 @@ public class ServiceUsuario {
     }
 
 
+    @Cacheable("todosOsUsuarios")
     public List<DtoResponseUsuario> listarTodos() {
         return new ArrayList<>(repositorioUsuario.listarUsuarios()).stream()
                 .map(DtoResponseUsuario::converter).toList();

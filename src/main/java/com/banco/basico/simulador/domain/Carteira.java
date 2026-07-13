@@ -10,7 +10,7 @@ import java.util.UUID;
 @Setter
 public class Carteira {
     UUID id = UUID.randomUUID();
-    BigDecimal saldo = BigDecimal.valueOf(0);
+    BigDecimal saldo = BigDecimal.valueOf(1000);
     Usuario usuario;
 
     public Carteira(Usuario usuario) {

@@ -3,6 +3,7 @@ package com.banco.basico.simulador.domain;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
@@ -11,13 +12,13 @@ import java.util.UUID;
 @Setter
 public class Transacao {
     UUID id;
-    float valor;
-    Usuario remetente;
-    Usuario destinatario;
+    BigDecimal valor;
+    UUID remetente;
+    UUID destinatario;
     LocalDate data;
     LocalTime hora;
 
-    public Transacao(float valor, Usuario remetente, Usuario destinatario, LocalDate data, LocalTime hora) {
+    public Transacao(BigDecimal valor, UUID remetente, UUID destinatario, LocalDate data, LocalTime hora) {
         this.id = UUID.randomUUID();
         this.valor = valor;
         this.remetente = remetente;
