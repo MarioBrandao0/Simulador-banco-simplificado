@@ -27,15 +27,15 @@ public class ServiceUsuario {
     @Autowired
     RepositorioCarteira repositorioCarteira;
 
-    public Optional<Usuario> buscarUsuario(UUID idRemetente) {
-        return Optional.ofNullable(repositorioUsuario.buscarUsuario(idRemetente)
-                .orElseThrow(() -> new UsuarioNaoEncontradoException("Remetente não encontrado")));
+    public Optional<Usuario> buscarUsuario(UUID idUsuario) {
+        return Optional.ofNullable(repositorioUsuario.buscarUsuario(idUsuario)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado")));
 
     }
 
-    public Optional<Usuario> buscarUsuarioPorCpf(String chavePixDestinatario) {
-        return Optional.ofNullable(repositorioUsuario.buscarUsuarioPorCpf(chavePixDestinatario)
-                .orElseThrow(() -> new UsuarioNaoEncontradoException("Destinatário não encontrado")));
+    public Optional<Usuario> buscarUsuarioPorCpf(String cpf) {
+        return Optional.ofNullable(repositorioUsuario.buscarUsuarioPorCpf(cpf)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário com CPF não encontrado")));
     }
 
 
