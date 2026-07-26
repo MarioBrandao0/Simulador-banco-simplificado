@@ -16,8 +16,8 @@ public class ControllerCarteira {
 
     ServiceCarteira serviceCarteira;
 
-    @GetMapping("/{idUsuaro}/carteira")
-    public ResponseEntity<?> consultarSaldo(@PathVariable UUID idUsuario){
-        return ResponseEntity.ok().body(serviceCarteira.consultarSaldo(idUsuario));
+    @GetMapping("/{id}/saldo")
+    public ResponseEntity<?> consultarSaldo(@PathVariable UUID id){
+        return ResponseEntity.ok().body(serviceCarteira.consultarSaldo(id));
     }
 }
