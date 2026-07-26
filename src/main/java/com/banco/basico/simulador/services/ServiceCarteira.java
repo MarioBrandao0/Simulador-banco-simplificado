@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 
-import java.util.Optional;
+
 import java.util.UUID;
 
 @Service
@@ -25,11 +25,16 @@ public class ServiceCarteira {
     private final ServiceUsuario serviceUsuario;
     private final RepositorioCarteira repositorioCarteira;
 
-    private Usuario buscarDonoDaCarteira(UUID idUsuario) {
-        return serviceUsuario.buscarUsuarioPorId(idUsuario);
+    private Carteira buscarCarteira(UUID idUsuario) {
+        Usuario usuario = serviceUsuario.buscarUsuarioPorId(idUsuario);
+        Carteira carteira = repositorioCarteira.buscarCarteira(usuario.getCarteira().getId())
+                .orElseThrow(() -> new CarteiraNaoEncontradaException("Carteira não encontrada"));
+
+        return carteira;
     }
 
-    @Cacheable("saldos")
+
+    @Cacheable(value = "saldos", key = "#idUsuario")
     public DtoResponseSaldo consultarSaldo(UUID idUsuario) {
         Usuario usuario = serviceUsuario.buscarUsuarioPorId(idUsuario);
 
@@ -39,29 +44,25 @@ public class ServiceCarteira {
         return new DtoResponseSaldo(usuario.getNome(), carteira.getSaldo());
     }
 
-    @CacheEvict("saldos")
+    @CacheEvict(value = "saldos", key = "#idUsuario")
     public void depositar(UUID idUsuario, BigDecimal valor) {
-        Usuario donoDaCarteira = buscarDonoDaCarteira(idUsuario);
+
         if (valor.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Valor deve ser maior que zero");
         }
 
-        Carteira carteira = repositorioCarteira.buscarCarteira(donoDaCarteira.getCarteira().getId())
-                .orElseThrow(() -> new CarteiraNaoEncontradaException("Carteira não encontrada"));
+        Carteira carteira = buscarCarteira(idUsuario);
 
         carteira.setSaldo(carteira.getSaldo().add(valor));
     }
 
-    @CacheEvict("saldos")
+    @CacheEvict(value = "saldos", key = "#idUsuario")
     public void sacar(UUID idUsuario, BigDecimal valor) {
-        Usuario donoDaCarteira = buscarDonoDaCarteira(idUsuario);
-
         if (valor.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Valor deve ser maior que zero");
         }
 
-        Carteira carteira = repositorioCarteira.buscarCarteira(donoDaCarteira.getCarteira().getId())
-                .orElseThrow(() -> new CarteiraNaoEncontradaException("Carteira não encontrada"));
+        Carteira carteira = buscarCarteira(idUsuario);
 
         if (carteira.getSaldo().compareTo(valor) < 0) {
             throw new SaldoInsuficienteException("Saldo insuficiente");
