@@ -1,6 +1,5 @@
 package com.banco.basico.simulador.repositorys;
 
-import com.banco.basico.simulador.domain.Carteira;
 import com.banco.basico.simulador.domain.Usuario;
 import org.springframework.stereotype.Repository;
 
@@ -16,7 +15,7 @@ public class RepositorioUsuario {
         this.usuarios.put(usuario.getId(), usuario);
     }
 
-    public Optional<Usuario> buscarUsuario(UUID id) {
+    public Optional<Usuario> buscarPorId (UUID id) {
         return Optional.of(this.usuarios.get(id));
     }
 

@@ -4,10 +4,9 @@ import com.banco.basico.simulador.dto.DtoTransacao;
 import com.banco.basico.simulador.services.ServiceTransacao;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/transacao")
@@ -16,6 +15,11 @@ public class ControllerTransacao {
 
     public ControllerTransacao(ServiceTransacao serviceTransacao) {
         this.serviceTransacao = serviceTransacao;
+    }
+
+    @GetMapping("/usuario/{id}")
+    public ResponseEntity<?> listarTransacoes(@PathVariable UUID id) {
+        return ResponseEntity.ok(serviceTransacao.listarTransacoes(id));
     }
 
     @PostMapping("/transferir")

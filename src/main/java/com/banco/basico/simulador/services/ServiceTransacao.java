@@ -3,6 +3,7 @@ package com.banco.basico.simulador.services;
 import com.banco.basico.simulador.clients.AutorizadorClient;
 import com.banco.basico.simulador.domain.Transacao;
 import com.banco.basico.simulador.domain.Usuario;
+import com.banco.basico.simulador.dto.DtoResponseListarTransacoes;
 import com.banco.basico.simulador.dto.DtoTransacao;
 import com.banco.basico.simulador.enums.TipoUsuario;
 import com.banco.basico.simulador.exceptions.*;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,30 +22,50 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ServiceTransacao {
     private final RepositorioTransacao repositorioTransacao;
-    private final RepositorioUsuario repositorioUsuario;
     private final ServiceUsuario serviceUsuario;
     private final AutorizadorClient autorizadorClient;
 
     private final ServiceCarteira serviceCarteira;
 
 
-    private Usuario buscarRemetente(UUID idRemetente) {
-        return Optional.ofNullable(repositorioUsuario.buscarUsuario(idRemetente)).orElseThrow(() -> new RemetenteNaoEncontradoException("Remetente não encontrado")).get();
+    private Usuario buscarUsuarioPorId(UUID idRemetente) {
+        return serviceUsuario.buscarUsuarioPorId(idRemetente);
     }
 
     //No momento só busca por cpf
-    private Usuario buscarDestinatario(String chavePixDestinatario) {
-        return Optional.ofNullable(repositorioUsuario.buscarUsuarioPorCpf(chavePixDestinatario)).orElseThrow(() -> new DestinatarioNaoEncontradoException("Destinatário não encontrado com essa chave pix")).get();
+    private Usuario buscarUsuarioPorChavePix(String chavePixDestinatario) {
+        return serviceUsuario.buscarUsuarioPorCpf(chavePixDestinatario);
+    }
+
+
+    public List<DtoResponseListarTransacoes> listarTransacoes(UUID idUsuario) {
+        List<Transacao> listaDeTransacoesDoUsuario = repositorioTransacao.ListarTransacoesUsuario(idUsuario);
+
+        List<DtoResponseListarTransacoes> dtoResponse = listaDeTransacoesDoUsuario.stream().map(t -> {
+            Usuario remetente = buscarUsuarioPorId(t.getRemetente());
+            Usuario destinatario = buscarUsuarioPorId(t.getDestinatario());
+
+            return new DtoResponseListarTransacoes(
+                    remetente.getNome(),
+                    t.getValor(),
+                    destinatario.getNome(),
+                    t.getData(),
+                    t.getHora()
+
+            );
+        }).toList();
+
+        return dtoResponse;
     }
 
     public void transacao(DtoTransacao dtoTransacao) {
-        Usuario remetente = buscarRemetente(dtoTransacao.idRemetente());
+        Usuario remetente = buscarUsuarioPorId(dtoTransacao.idRemetente());
 
         if (remetente.getTipoUsuario().equals(TipoUsuario.LOJISTA)) {
             throw new LojistaNaoPodeTransferirException("Lojista não pode transferir dinheiro");
         }
 
-        Usuario destinatario = buscarDestinatario(dtoTransacao.chavePixDestinatario());
+        Usuario destinatario = buscarUsuarioPorChavePix(dtoTransacao.chavePixDestinatario());
 
         if (remetente.getId().equals(destinatario.getId())) {
             throw new TransferenciaParaSiMesmoException("Não pode transferir dinheiro para si mesmo");

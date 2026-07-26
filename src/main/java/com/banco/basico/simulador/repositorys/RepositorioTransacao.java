@@ -18,6 +18,10 @@ public class RepositorioTransacao {
     }
 
     public List<Transacao> ListarTransacoesUsuario(UUID idUsuario) {
-        return transacoes.values().stream().filter(t -> t.getId().equals(idUsuario)).toList();
+        return transacoes.values()
+                .stream()
+                .filter(t -> t.getRemetente().equals(idUsuario)
+                        || t.getDestinatario().equals(idUsuario))
+                .toList();
     }
 }

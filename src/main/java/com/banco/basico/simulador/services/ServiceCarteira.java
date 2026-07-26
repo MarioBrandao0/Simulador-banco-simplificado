@@ -26,17 +26,17 @@ public class ServiceCarteira {
     private final RepositorioCarteira repositorioCarteira;
 
     private Usuario buscarDonoDaCarteira(UUID idUsuario) {
-        return serviceUsuario.buscarUsuario(idUsuario).get();
+        return serviceUsuario.buscarUsuarioPorId(idUsuario);
     }
 
     @Cacheable("saldos")
     public DtoResponseSaldo consultarSaldo(UUID idUsuario) {
-        Optional<Usuario> usuario = serviceUsuario.buscarUsuario(idUsuario);
+        Usuario usuario = serviceUsuario.buscarUsuarioPorId(idUsuario);
 
-        Carteira carteira = repositorioCarteira.buscarCarteira(usuario.get().getCarteira().getId())
+        Carteira carteira = repositorioCarteira.buscarCarteira(usuario.getCarteira().getId())
                 .orElseThrow(() -> new CarteiraNaoEncontradaException("Carteira não encontrada"));
 
-        return new DtoResponseSaldo(usuario.get().getNome(), carteira.getSaldo());
+        return new DtoResponseSaldo(usuario.getNome(), carteira.getSaldo());
     }
 
     @CacheEvict("saldos")
