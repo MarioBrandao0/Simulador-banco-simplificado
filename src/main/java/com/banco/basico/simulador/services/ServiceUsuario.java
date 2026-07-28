@@ -12,6 +12,8 @@ import com.banco.basico.simulador.repositorys.RepositorioUsuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,6 +28,8 @@ public class ServiceUsuario {
 
     @Autowired
     RepositorioCarteira repositorioCarteira;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public Usuario buscarUsuarioPorId(UUID idUsuario) {
         return Optional.ofNullable(repositorioUsuario.buscarPorId(idUsuario)
@@ -59,8 +63,9 @@ public class ServiceUsuario {
         emailExiste(dtoUsuario.email());
         cpfExiste(dtoUsuario.cpf());
 
+        String senhaConvertida = passwordEncoder.encode(dtoUsuario.senha());
 
-        Usuario novoUsuario = new Usuario(dtoUsuario.cpf(), dtoUsuario.nome(), dtoUsuario.email(), dtoUsuario.senha(), dtoUsuario.tipoUsuario());
+        Usuario novoUsuario = new Usuario(dtoUsuario.cpf(), dtoUsuario.nome(), dtoUsuario.email(), senhaConvertida, dtoUsuario.tipoUsuario());
         Carteira carteira = new Carteira(novoUsuario);
 
        novoUsuario.setCarteira(carteira);

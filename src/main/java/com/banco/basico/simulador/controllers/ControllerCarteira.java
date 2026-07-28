@@ -1,8 +1,9 @@
 package com.banco.basico.simulador.controllers;
 
-import com.banco.basico.simulador.dto.DtoResponseSaldo;
+
 import com.banco.basico.simulador.services.ServiceCarteira;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,8 +17,9 @@ public class ControllerCarteira {
 
     ServiceCarteira serviceCarteira;
 
-    @GetMapping("/{id}/saldo")
-    public ResponseEntity<?> consultarSaldo(@PathVariable UUID id){
-        return ResponseEntity.ok().body(serviceCarteira.consultarSaldo(id));
+    @GetMapping("/saldo/{id}")
+    public ResponseEntity<?> consultarSaldo(@PathVariable UUID id, Authentication authentication) {
+        String emailVerificado = authentication.getName();
+        return ResponseEntity.ok().body(serviceCarteira.consultarSaldo(id, emailVerificado));
     }
 }

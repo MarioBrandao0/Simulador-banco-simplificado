@@ -11,6 +11,7 @@ import com.banco.basico.simulador.repositorys.RepositorioUsuario;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -34,9 +35,13 @@ public class ServiceCarteira {
     }
 
 
-    @Cacheable(value = "saldos", key = "#idUsuario")
-    public DtoResponseSaldo consultarSaldo(UUID idUsuario) {
+
+    public DtoResponseSaldo consultarSaldo(UUID idUsuario, String emailVerificado) {
         Usuario usuario = serviceUsuario.buscarUsuarioPorId(idUsuario);
+
+        if (!usuario.getEmail().equals(emailVerificado)) {
+            throw new AccessDeniedException("Você não tem permissão");
+        }
 
         Carteira carteira = repositorioCarteira.buscarCarteira(usuario.getCarteira().getId())
                 .orElseThrow(() -> new CarteiraNaoEncontradaException("Carteira não encontrada"));

@@ -8,14 +8,15 @@ import com.banco.basico.simulador.dto.DtoTransacao;
 import com.banco.basico.simulador.enums.TipoUsuario;
 import com.banco.basico.simulador.exceptions.*;
 import com.banco.basico.simulador.repositorys.RepositorioTransacao;
-import com.banco.basico.simulador.repositorys.RepositorioUsuario;
+
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
+
 import java.util.UUID;
 
 @Service
@@ -38,7 +39,14 @@ public class ServiceTransacao {
     }
 
 
-    public List<DtoResponseListarTransacoes> listarTransacoes(UUID idUsuario) {
+    public List<DtoResponseListarTransacoes> listarTransacoes(UUID idUsuario, String emailVeirifcado)  {
+        Usuario usuarioDoId = buscarUsuarioPorId(idUsuario);
+
+        if (!usuarioDoId.getEmail().equals(emailVeirifcado)) {
+            throw new AccessDeniedException("Voçê não tem acesso para visualizar essas transações");
+        }
+
+
         List<Transacao> listaDeTransacoesDoUsuario = repositorioTransacao.ListarTransacoesUsuario(idUsuario);
 
         List<DtoResponseListarTransacoes> dtoResponse = listaDeTransacoesDoUsuario.stream().map(t -> {
@@ -76,10 +84,6 @@ public class ServiceTransacao {
         if (!autorizado) {
             throw new TransferenciaNaoAutorizada("Transferencia não autorizada");
         }
-
-
-        LocalDate data = LocalDate.now();
-        LocalTime hora = LocalTime.now();
 
         serviceCarteira.sacar(remetente.getId(), dtoTransacao.valor());
         serviceCarteira.depositar(destinatario.getId(), dtoTransacao.valor());
