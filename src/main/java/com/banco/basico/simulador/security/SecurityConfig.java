@@ -43,7 +43,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests( auth -> auth
                         .requestMatchers("/api/usuario/criar").permitAll()
 
-                        .requestMatchers("/api/transacao/**").hasAnyAuthority("LOJISTA", "CLIENTE")
+                        .requestMatchers("/api/transacao/**", "/api/carteira/**").hasAnyAuthority("LOJISTA", "CLIENTE")
                         .requestMatchers(HttpMethod.POST, "/api/transacao/transferir").hasAuthority("CLIENTE")
 
                         .anyRequest().permitAll()

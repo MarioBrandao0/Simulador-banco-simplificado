@@ -30,9 +30,10 @@ public class ServiceAuth {
                 dtoLogin.senha()
         );
 
-
+        // Aqui ele já compara a senha(Vc não precisa fazer comparação manual)
         Authentication authentication = authenticationManager.authenticate(credenciais);
 
+        // E ele so chega aqui se a senha e os dados baterem
         String emailAutenticado = authentication.getName();
 
         Usuario usuario = repositorioUsuario.buscarUsuarioPorEmail(emailAutenticado).orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"));

@@ -39,14 +39,7 @@ public class ServiceTransacao {
     }
 
 
-    public List<DtoResponseListarTransacoes> listarTransacoes(UUID idUsuario, String emailVeirifcado)  {
-        Usuario usuarioDoId = buscarUsuarioPorId(idUsuario);
-
-        if (!usuarioDoId.getEmail().equals(emailVeirifcado)) {
-            throw new AccessDeniedException("Voçê não tem acesso para visualizar essas transações");
-        }
-
-
+    public List<DtoResponseListarTransacoes> listarTransacoes(UUID idUsuario)  {
         List<Transacao> listaDeTransacoesDoUsuario = repositorioTransacao.ListarTransacoesUsuario(idUsuario);
 
         List<DtoResponseListarTransacoes> dtoResponse = listaDeTransacoesDoUsuario.stream().map(t -> {
@@ -66,12 +59,8 @@ public class ServiceTransacao {
         return dtoResponse;
     }
 
-    public void transacao(DtoTransacao dtoTransacao) {
-        Usuario remetente = buscarUsuarioPorId(dtoTransacao.idRemetente());
-
-        if (remetente.getTipoUsuario().equals(TipoUsuario.LOJISTA)) {
-            throw new LojistaNaoPodeTransferirException("Lojista não pode transferir dinheiro");
-        }
+    public void transacao(DtoTransacao dtoTransacao, UUID idRemetente) {
+        Usuario remetente = buscarUsuarioPorId(idRemetente);
 
         Usuario destinatario = buscarUsuarioPorChavePix(dtoTransacao.chavePixDestinatario());
 

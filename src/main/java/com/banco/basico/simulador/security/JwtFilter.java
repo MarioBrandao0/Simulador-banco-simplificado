@@ -29,7 +29,7 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String header = request.getHeader("Authorization");
 
-        //Aqui nos passamo porque nosso arquivo de SpringSecurity decide quais rotas precisam de token ou não
+        //Aqui nos passamos porque nosso arquivo de SpringSecurity decide quais rotas precisam de token ou não
         if (header == null || !header.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -46,7 +46,7 @@ public class JwtFilter extends OncePerRequestFilter {
             String email = jwtService.extrairEmail(token);
 
             if  (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails usuario = userDetailsService.loadUserByUsername(email);
+                UserDetails usuario = (UsuarioAutenticado) userDetailsService.loadUserByUsername(email);
 
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
 

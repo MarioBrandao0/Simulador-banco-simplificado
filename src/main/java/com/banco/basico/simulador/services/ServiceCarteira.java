@@ -36,12 +36,8 @@ public class ServiceCarteira {
 
 
 
-    public DtoResponseSaldo consultarSaldo(UUID idUsuario, String emailVerificado) {
+    public DtoResponseSaldo consultarSaldo(UUID idUsuario) {
         Usuario usuario = serviceUsuario.buscarUsuarioPorId(idUsuario);
-
-        if (!usuario.getEmail().equals(emailVerificado)) {
-            throw new AccessDeniedException("Você não tem permissão");
-        }
 
         Carteira carteira = repositorioCarteira.buscarCarteira(usuario.getCarteira().getId())
                 .orElseThrow(() -> new CarteiraNaoEncontradaException("Carteira não encontrada"));
@@ -49,7 +45,7 @@ public class ServiceCarteira {
         return new DtoResponseSaldo(usuario.getNome(), carteira.getSaldo());
     }
 
-    @CacheEvict(value = "saldos", key = "#idUsuario")
+
     public void depositar(UUID idUsuario, BigDecimal valor) {
 
         if (valor.compareTo(BigDecimal.ZERO) <= 0) {
@@ -61,7 +57,7 @@ public class ServiceCarteira {
         carteira.setSaldo(carteira.getSaldo().add(valor));
     }
 
-    @CacheEvict(value = "saldos", key = "#idUsuario")
+
     public void sacar(UUID idUsuario, BigDecimal valor) {
         if (valor.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Valor deve ser maior que zero");
