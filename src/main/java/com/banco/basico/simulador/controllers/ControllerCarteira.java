@@ -3,6 +3,8 @@ package com.banco.basico.simulador.controllers;
 
 import com.banco.basico.simulador.security.UsuarioAutenticado;
 import com.banco.basico.simulador.services.ServiceCarteira;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,9 +17,13 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/carteira")
-public class ControllerCarteira {
 
+public class ControllerCarteira {
     ServiceCarteira serviceCarteira;
+
+    public ControllerCarteira(ServiceCarteira serviceCarteira) {
+        this.serviceCarteira = serviceCarteira;
+    }
 
     @GetMapping("/saldo")
     public ResponseEntity<?> consultarSaldo(@AuthenticationPrincipal UsuarioAutenticado authentication) {

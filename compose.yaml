@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:18
+    container_name: simulador_postgres
+
+    environment:
+      POSTGRES_DB: simulador_banco
+      POSTGRES_USER: simulador
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    image: simulador-banco:1.0
+
+    container_name: simulador-banco-api
+
+    ports:
+      - "8080:8080"
+
+    env_file:
+      - .env
+
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-3600000}
+
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

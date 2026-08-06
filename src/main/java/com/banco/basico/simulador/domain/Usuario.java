@@ -1,24 +1,40 @@
 package com.banco.basico.simulador.domain;
 
 import com.banco.basico.simulador.enums.TipoUsuario;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.UUID;
 
+
+@Entity
+@Table(name = "usuarios")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Usuario {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     UUID id;
+
+    @Column(nullable = false, unique = true)
     String cpf;
+    @Column(nullable = false)
     String nome;
+    @Column(nullable = false)
     String email;
+    @Column(nullable = false)
     String senha;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     TipoUsuario tipoUsuario;
+
+    @OneToOne(cascade = CascadeType.ALL, optional = false)
+    @JoinColumn(name = "carteira_id",nullable = false, unique = true)
     Carteira carteira;
 
     public Usuario(String cpf, String nome, String email, String senha, TipoUsuario tipoUsuario) {
-        this.id = UUID.randomUUID();
         this.cpf = cpf;
         this.nome = nome;
         this.email = email;

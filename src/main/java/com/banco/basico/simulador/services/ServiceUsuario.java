@@ -9,6 +9,7 @@ import com.banco.basico.simulador.exceptions.EmailExistenteException;
 import com.banco.basico.simulador.exceptions.UsuarioNaoEncontradoException;
 import com.banco.basico.simulador.repositorys.RepositorioCarteira;
 import com.banco.basico.simulador.repositorys.RepositorioUsuario;
+import com.banco.basico.simulador.repositorys.RepositoryUsuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -24,27 +25,29 @@ import java.util.UUID;
 @Service
 public class ServiceUsuario {
     @Autowired
-    RepositorioUsuario repositorioUsuario;
+    RepositoryUsuario repositoryUsuario;
 
     @Autowired
     RepositorioCarteira repositorioCarteira;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private RepositorioUsuario repositorioUsuario;
 
     public Usuario buscarUsuarioPorId(UUID idUsuario) {
-        return Optional.ofNullable(repositorioUsuario.buscarPorId(idUsuario)
-                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado"))).get();
+        return (repositoryUsuario.findById(idUsuario)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário não encontrado")));
 
     }
 
     public Usuario buscarUsuarioPorCpf(String cpf) {
-        return Optional.ofNullable(repositorioUsuario.buscarUsuarioPorCpf(cpf)
-                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário com CPF não encontrado"))).get();
+        return repositoryUsuario.findByCpf(cpf)
+                .orElseThrow(() -> new UsuarioNaoEncontradoException("Usuário com CPF não encontrado"));
     }
 
 
     private void emailExiste(String email) throws EmailExistenteException {
-        Optional<Usuario> usuarioPorEmail = repositorioUsuario.buscarUsuarioPorEmail(email);
+        Optional<Usuario> usuarioPorEmail = repositoryUsuario.findByEmail(email);
 
         if (usuarioPorEmail.isPresent()) {
             throw new EmailExistenteException("Email existente");
@@ -52,7 +55,7 @@ public class ServiceUsuario {
     }
 
     private void cpfExiste(String cpf) throws CpfExistenteException {
-        Optional<Usuario> usuarioPorCpf = repositorioUsuario.buscarUsuarioPorCpf(cpf);
+        Optional<Usuario> usuarioPorCpf = repositoryUsuario.findByCpf(cpf);
         if (usuarioPorCpf.isPresent()) {
             throw new CpfExistenteException("CPF existente");
         }
@@ -66,17 +69,17 @@ public class ServiceUsuario {
         String senhaConvertida = passwordEncoder.encode(dtoUsuario.senha());
 
         Usuario novoUsuario = new Usuario(dtoUsuario.cpf(), dtoUsuario.nome(), dtoUsuario.email(), senhaConvertida, dtoUsuario.tipoUsuario());
-        Carteira carteira = new Carteira(novoUsuario);
+        Carteira carteira = new Carteira();
 
-       novoUsuario.setCarteira(carteira);
-       repositorioUsuario.salvarUsuario(novoUsuario);
-       repositorioCarteira.salvarCarteira(carteira);
+        novoUsuario.setCarteira(carteira);
+        repositoryUsuario.save(novoUsuario);
+
     }
 
 
     @Cacheable("todosOsUsuarios")
     public List<DtoResponseUsuario> listarTodos() {
-        return new ArrayList<>(repositorioUsuario.listarUsuarios()).stream()
+        return new ArrayList<>(repositoryUsuario.findAll()).stream()
                 .map(DtoResponseUsuario::converter).toList();
     }
 }

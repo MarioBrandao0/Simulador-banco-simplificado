@@ -23,6 +23,9 @@ public class ControllerUsuario {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+
+    // Endpoint intencionalmente mantido sem autenticação para facilitar os testes da API.
+    // Em um cenário real de produção, esta rota deve ser protegida por autenticação e autorização.
     @GetMapping("/listar")
     public ResponseEntity<?> listarTodos() {
         List<DtoResponseUsuario> listaDeUsuarios = serviceUsuario.listarTodos();
