@@ -1,0 +1,15 @@
+package com.banco.basico.simulador.repositorys;
+
+import com.banco.basico.simulador.domain.Carteira;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+import java.util.UUID;
+
+@Repository
+public interface RepositoryCarteira extends JpaRepository<Carteira, UUID> {
+    @Query("SELECT u.carteira FROM Usuario u WHERE u.id = :idUsuario")
+    public Optional<Carteira> encontrarCarteiraPorIdUsuario(UUID idUsuario);
+}

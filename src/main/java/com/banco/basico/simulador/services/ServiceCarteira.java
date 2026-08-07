@@ -1,17 +1,15 @@
 package com.banco.basico.simulador.services;
 
 import com.banco.basico.simulador.domain.Carteira;
-import com.banco.basico.simulador.domain.Usuario;
+
 import com.banco.basico.simulador.dto.DtoResponseSaldo;
 import com.banco.basico.simulador.exceptions.CarteiraNaoEncontradaException;
 import com.banco.basico.simulador.exceptions.SaldoInsuficienteException;
-import com.banco.basico.simulador.exceptions.UsuarioNaoEncontradoException;
-import com.banco.basico.simulador.repositorys.RepositorioCarteira;
-import com.banco.basico.simulador.repositorys.RepositorioUsuario;
+
+import com.banco.basico.simulador.repositorys.RepositoryCarteira;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.security.access.AccessDeniedException;
+
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -24,28 +22,21 @@ import java.util.UUID;
 public class ServiceCarteira {
 
     private final ServiceUsuario serviceUsuario;
-    private final RepositorioCarteira repositorioCarteira;
+    private final RepositoryCarteira repositoryCarteira;
 
     private Carteira buscarCarteira(UUID idUsuario) {
-        Usuario usuario = serviceUsuario.buscarUsuarioPorId(idUsuario);
-        Carteira carteira = repositorioCarteira.buscarCarteira(usuario.getCarteira().getId())
-                .orElseThrow(() -> new CarteiraNaoEncontradaException("Carteira não encontrada"));
-
+        Carteira carteira = repositoryCarteira.encontrarCarteiraPorIdUsuario(idUsuario).orElseThrow(() -> new CarteiraNaoEncontradaException("Carteira não encontrada"));
         return carteira;
     }
 
 
 
     public DtoResponseSaldo consultarSaldo(UUID idUsuario) {
-        Usuario usuario = serviceUsuario.buscarUsuarioPorId(idUsuario);
-
-        Carteira carteira = repositorioCarteira.buscarCarteira(usuario.getCarteira().getId())
-                .orElseThrow(() -> new CarteiraNaoEncontradaException("Carteira não encontrada"));
-
-        return new DtoResponseSaldo(usuario.getNome(), carteira.getSaldo());
+        Carteira carteira = buscarCarteira(idUsuario);
+        return new DtoResponseSaldo(carteira.getSaldo());
     }
 
-
+    @Transactional
     public void depositar(UUID idUsuario, BigDecimal valor) {
 
         if (valor.compareTo(BigDecimal.ZERO) <= 0) {
@@ -57,7 +48,7 @@ public class ServiceCarteira {
         carteira.setSaldo(carteira.getSaldo().add(valor));
     }
 
-
+    @Transactional
     public void sacar(UUID idUsuario, BigDecimal valor) {
         if (valor.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Valor deve ser maior que zero");

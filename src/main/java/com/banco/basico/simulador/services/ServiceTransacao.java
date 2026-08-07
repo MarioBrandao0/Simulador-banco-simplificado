@@ -5,12 +5,10 @@ import com.banco.basico.simulador.domain.Transacao;
 import com.banco.basico.simulador.domain.Usuario;
 import com.banco.basico.simulador.dto.DtoResponseListarTransacoes;
 import com.banco.basico.simulador.dto.DtoTransacao;
-import com.banco.basico.simulador.enums.TipoUsuario;
 import com.banco.basico.simulador.exceptions.*;
-import com.banco.basico.simulador.repositorys.RepositorioTransacao;
 
+import com.banco.basico.simulador.repositorys.RepositoryTransacao;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -22,7 +20,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ServiceTransacao {
-    private final RepositorioTransacao repositorioTransacao;
+    private final RepositoryTransacao repositorioTransacao;
     private final ServiceUsuario serviceUsuario;
     private final AutorizadorClient autorizadorClient;
 
@@ -40,21 +38,15 @@ public class ServiceTransacao {
 
 
     public List<DtoResponseListarTransacoes> listarTransacoes(UUID idUsuario)  {
-        List<Transacao> listaDeTransacoesDoUsuario = repositorioTransacao.ListarTransacoesUsuario(idUsuario);
+        List<Transacao> listaDeTransacoesDoUsuario = repositorioTransacao.findByRemetente_Id(idUsuario);
 
-        List<DtoResponseListarTransacoes> dtoResponse = listaDeTransacoesDoUsuario.stream().map(t -> {
-            Usuario remetente = buscarUsuarioPorId(t.getRemetente());
-            Usuario destinatario = buscarUsuarioPorId(t.getDestinatario());
-
-            return new DtoResponseListarTransacoes(
-                    remetente.getNome(),
-                    t.getValor(),
-                    destinatario.getNome(),
-                    t.getData(),
-                    t.getHora()
-
-            );
-        }).toList();
+        List<DtoResponseListarTransacoes> dtoResponse = listaDeTransacoesDoUsuario.stream().map(t -> new DtoResponseListarTransacoes(
+                t.getRemetente().getNome(),
+                t.getValor(),
+                t.getDestinatario().getNome(),
+                t.getData(),
+                t.getHora()
+        )).toList();
 
         return dtoResponse;
     }
@@ -79,12 +71,12 @@ public class ServiceTransacao {
 
         Transacao novaTransacao = new Transacao(
                 dtoTransacao.valor(),
-                remetente.getId(),
-                destinatario.getId(),
+                remetente,
+                destinatario,
                 LocalDate.now(),
                 LocalTime.now()
         );
 
-        repositorioTransacao.salvar(novaTransacao);
+        repositorioTransacao.save(novaTransacao);
     }
 }

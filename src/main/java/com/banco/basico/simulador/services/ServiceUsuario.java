@@ -7,13 +7,11 @@ import com.banco.basico.simulador.dto.DtoUsuario;
 import com.banco.basico.simulador.exceptions.CpfExistenteException;
 import com.banco.basico.simulador.exceptions.EmailExistenteException;
 import com.banco.basico.simulador.exceptions.UsuarioNaoEncontradoException;
-import com.banco.basico.simulador.repositorys.RepositorioCarteira;
-import com.banco.basico.simulador.repositorys.RepositorioUsuario;
+import com.banco.basico.simulador.repositorys.RepositoryCarteira;
 import com.banco.basico.simulador.repositorys.RepositoryUsuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,14 +23,10 @@ import java.util.UUID;
 @Service
 public class ServiceUsuario {
     @Autowired
-    RepositoryUsuario repositoryUsuario;
+    private RepositoryUsuario repositoryUsuario;
 
     @Autowired
-    RepositorioCarteira repositorioCarteira;
-    @Autowired
     private PasswordEncoder passwordEncoder;
-    @Autowired
-    private RepositorioUsuario repositorioUsuario;
 
     public Usuario buscarUsuarioPorId(UUID idUsuario) {
         return (repositoryUsuario.findById(idUsuario)

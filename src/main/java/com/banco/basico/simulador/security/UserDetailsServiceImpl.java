@@ -1,8 +1,7 @@
 package com.banco.basico.simulador.security;
 
 import com.banco.basico.simulador.domain.Usuario;
-import com.banco.basico.simulador.exceptions.UsuarioNaoEncontradoException;
-import com.banco.basico.simulador.repositorys.RepositorioUsuario;
+import com.banco.basico.simulador.repositorys.RepositoryUsuario;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,17 +10,16 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private final RepositorioUsuario repositorioUsuario;
+    private final RepositoryUsuario repositorioUsuario;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Usuario usuario = repositorioUsuario.buscarUsuarioPorEmail(email).orElseThrow(() -> new UsernameNotFoundException("Usuario não encontrado"));
+        Usuario usuario = repositorioUsuario.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("Usuario não encontrado"));
 
         return new UsuarioAutenticado(
                 usuario.getId(),

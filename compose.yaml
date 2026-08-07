@@ -5,11 +5,13 @@ services:
 
     environment:
       POSTGRES_DB: simulador_banco
-      POSTGRES_USER: simulador
+      POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
     ports:
       - "5432:5432"
+    env_file:
+      - .env
 
     volumes:
       - postgres_data:/var/lib/postgresql
