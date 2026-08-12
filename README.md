@@ -397,10 +397,9 @@ A persistência em banco de dados está entre as evoluções planejadas para o p
 
 Algumas das melhorias planejadas são:
 
-- [ ] Persistência com banco de dados
-- [ ] PostgreSQL
-- [ ] Spring Data JPA
-- [ ] Migrations com Flyway
+- [x] Persistência com banco de dados
+- [x] PostgreSQL
+- [x] Spring Data JPA
 - [ ] Chaves Pix
 - [ ] Extrato com paginação e filtros
 - [ ] Comprovantes de transferência
@@ -411,7 +410,6 @@ Algumas das melhorias planejadas são:
 - [ ] Testcontainers
 - [ ] Documentação OpenAPI / Swagger
 - [ ] Auditoria de operações
-- [ ] Observabilidade e métricas
 
 ---
 

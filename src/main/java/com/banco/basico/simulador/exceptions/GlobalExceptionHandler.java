@@ -13,7 +13,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<DtoError> handleAccessDeniedException(AccessDeniedException ex) {
         DtoError dtoError = new DtoError(HttpStatus.FORBIDDEN, ex.getMessage());
-
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(dtoError);
     }
 
