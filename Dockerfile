@@ -19,7 +19,7 @@ LABEL org.opencontainers.image.version="1.0"
 
 WORKDIR /app
 
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=build /app/target/0.0.1-SIMULADOR_BANCO.jar app.jar
 
 EXPOSE 8080
 

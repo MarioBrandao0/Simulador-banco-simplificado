@@ -19,11 +19,6 @@ public class ConfiguracaoHttp {
     }
 
     @Bean
-    public CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager();
-    }
-
-    @Bean
     @Primary
     public ObjectMapper objectMapper() {
         ObjectMapper mapper = new ObjectMapper();

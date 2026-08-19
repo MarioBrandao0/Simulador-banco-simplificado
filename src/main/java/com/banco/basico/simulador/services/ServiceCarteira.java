@@ -34,28 +34,13 @@ public class ServiceCarteira {
 
   @Transactional
   public void depositar(UUID idUsuario, BigDecimal valor) {
-
-    if (valor.compareTo(BigDecimal.ZERO) <= 0) {
-      throw new IllegalArgumentException("Valor deve ser maior que zero");
-    }
-
-    Carteira carteira = buscarCarteira(idUsuario);
-
-    carteira.setSaldo(carteira.getSaldo().add(valor));
+    Carteira carteira  = buscarCarteira(idUsuario);
+    carteira.depositar(valor);
   }
 
   @Transactional
   public void sacar(UUID idUsuario, BigDecimal valor) {
-    if (valor.compareTo(BigDecimal.ZERO) <= 0) {
-      throw new IllegalArgumentException("Valor deve ser maior que zero");
-    }
-
     Carteira carteira = buscarCarteira(idUsuario);
-
-    if (carteira.getSaldo().compareTo(valor) < 0) {
-      throw new SaldoInsuficienteException("Saldo insuficiente");
-    }
-
-    carteira.setSaldo(carteira.getSaldo().subtract(valor));
+    carteira.sacar(valor);
   }
 }

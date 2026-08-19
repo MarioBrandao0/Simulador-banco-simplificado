@@ -9,6 +9,7 @@ import com.banco.basico.simulador.exceptions.EmailExistenteException;
 import com.banco.basico.simulador.exceptions.UsuarioNaoEncontradoException;
 import com.banco.basico.simulador.repositorys.RepositoryCarteira;
 import com.banco.basico.simulador.repositorys.RepositoryUsuario;
+import com.banco.basico.simulador.util.NormalizadorDadosUsuarios;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -26,7 +27,39 @@ public class ServiceUsuario {
     private RepositoryUsuario repositoryUsuario;
 
     @Autowired
+    private NormalizadorDadosUsuarios normalizador;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @CacheEvict(value = "todosOsUsuarios", allEntries = true)
+    public void salvarUsuario(DtoUsuario dtoUsuario) {
+        emailExiste(dtoUsuario.email());
+        cpfExiste(dtoUsuario.cpf());
+
+        String senhaConvertida = passwordEncoder.encode(dtoUsuario.senha());
+
+        Usuario novoUsuario = new Usuario(
+                normalizador.normalizarCpf(dtoUsuario.cpf()),
+                dtoUsuario.nome(),
+                normalizador.normalizarEmail(dtoUsuario.email()),
+                senhaConvertida,
+                dtoUsuario.tipoUsuario()
+        );
+        Carteira carteira = new Carteira();
+
+        novoUsuario.setCarteira(carteira);
+        repositoryUsuario.save(novoUsuario);
+
+    }
+
+
+    @Cacheable("todosOsUsuarios")
+    public List<DtoResponseUsuario> listarTodos() {
+        return new ArrayList<>(repositoryUsuario.findAll()).stream()
+                .map(DtoResponseUsuario::converter).toList();
+    }
+
 
     public Usuario buscarUsuarioPorId(UUID idUsuario) {
         return (repositoryUsuario.findById(idUsuario)
@@ -53,27 +86,5 @@ public class ServiceUsuario {
         if (usuarioPorCpf.isPresent()) {
             throw new CpfExistenteException("CPF existente");
         }
-    }
-
-    @CacheEvict(value = "todosOsUsuarios", allEntries = true)
-    public void salvarUsuario(DtoUsuario dtoUsuario) {
-        emailExiste(dtoUsuario.email());
-        cpfExiste(dtoUsuario.cpf());
-
-        String senhaConvertida = passwordEncoder.encode(dtoUsuario.senha());
-
-        Usuario novoUsuario = new Usuario(dtoUsuario.cpf(), dtoUsuario.nome(), dtoUsuario.email(), senhaConvertida, dtoUsuario.tipoUsuario());
-        Carteira carteira = new Carteira();
-
-        novoUsuario.setCarteira(carteira);
-        repositoryUsuario.save(novoUsuario);
-
-    }
-
-
-    @Cacheable("todosOsUsuarios")
-    public List<DtoResponseUsuario> listarTodos() {
-        return new ArrayList<>(repositoryUsuario.findAll()).stream()
-                .map(DtoResponseUsuario::converter).toList();
     }
 }
