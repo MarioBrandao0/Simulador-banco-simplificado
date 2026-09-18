@@ -1,6 +1,7 @@
 package com.banco.basico.simulador.carteira.infrastructure.persistence;
 
 import com.banco.basico.simulador.carteira.domain.Carteira;
+import com.banco.basico.simulador.usuario.domain.Usuario;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -14,10 +15,13 @@ import java.util.UUID;
 @Repository
 public interface RepositoryCarteira extends JpaRepository<Carteira, UUID> {
 
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT u.carteira FROM Usuario u WHERE u.id = :idUsuario")
+    @Query("SELECT Carteira FROM Carteira WHERE usuario.id = :idUsuario")
     Optional<Carteira> buscarPorUsuarioIdComLock(@Param("idUsuario") UUID idUsuario);
 
-    @Query("SELECT u.carteira FROM Usuario u WHERE u.id = :idUsuario")
-    public Optional<Carteira> encontrarCarteiraPorIdUsuario(UUID idUsuario);
+
+    boolean existsByUsuario_Id(UUID usuarioId);
+
+    Optional<Carteira> findByUsuario_Id(UUID usuarioId);
 }

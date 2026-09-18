@@ -2,7 +2,10 @@ package com.banco.basico.simulador.integracao.autorizador.client;
 
 import com.banco.basico.simulador.integracao.autorizador.client.dto.DtoRespostaAutorizador;
 import com.banco.basico.simulador.integracao.autorizador.client.exception.ServicoIndisponivelException;
+import com.banco.basico.simulador.transferencia.application.AutorizadorTransferencia;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
@@ -10,10 +13,14 @@ import org.springframework.web.client.RestTemplate;
 
 @Component
 @RequiredArgsConstructor
-public class AutorizadorClient {
-    private static final String URL_AUTORIZADOR = "http://localhost:8080/mock/authorize";
+public class AutorizadorClient implements AutorizadorTransferencia {
+
+    @Getter
+    @Value("${URL_AUTORIZADOR}")
+    private String URL_AUTORIZADOR;
 
     private final RestTemplate restTemplate;
+
 
     public boolean autorizar() {
         try {
@@ -32,4 +39,5 @@ public class AutorizadorClient {
             throw new ServicoIndisponivelException("Serviço autorizador indisponível");
         }
     }
+
 }

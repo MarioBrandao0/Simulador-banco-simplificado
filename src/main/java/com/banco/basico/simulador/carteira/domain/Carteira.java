@@ -1,6 +1,7 @@
 package com.banco.basico.simulador.carteira.domain;
 
 import com.banco.basico.simulador.carteira.domain.exception.SaldoInsuficienteException;
+import com.banco.basico.simulador.usuario.domain.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,10 +24,18 @@ public class Carteira {
     @Column(nullable = false, precision = 19, scale = 2)
     BigDecimal saldo = BigDecimal.valueOf(1000);
 
+    @OneToOne(cascade = CascadeType.ALL, optional = false)
+    @JoinColumn(name = "usuario_id")
+    Usuario usuario;
+
     public void depositar(BigDecimal valor) {
         validarValor(valor);
 
         this.saldo = this.saldo.add(valor);
+    }
+
+    public Carteira(Usuario usuario) {
+        this.usuario = usuario;
     }
 
     public void sacar(BigDecimal valor) {

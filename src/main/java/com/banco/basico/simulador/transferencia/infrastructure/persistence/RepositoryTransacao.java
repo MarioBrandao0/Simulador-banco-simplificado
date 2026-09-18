@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface RepositoryTransacao extends JpaRepository<Transacao, UUID> {
     List<Transacao> findByRemetente_Id(UUID remetenteId);
 
-    List<Transacao> findByRemetente_IdAndDestinatario_Id(UUID remetenteId);
+    List<Transacao> findByRemetente_IdAndDestinatario_Id(UUID remetenteId, UUID destinatarioId);
 
     List<Transacao> findByRemetente_IdOrDestinatario_Id(UUID remetenteId,  UUID destinatarioId);
 }

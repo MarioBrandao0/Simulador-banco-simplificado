@@ -1,5 +1,6 @@
 package com.banco.basico.simulador.autenticacao.infrastructure.security;
 
+import com.banco.basico.simulador.autenticacao.infrastructure.ratelimit.RateLimitFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
@@ -24,6 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
+    private final RateLimitFilter rateLimitFilter;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -48,8 +50,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests( auth -> auth
                         .requestMatchers("/api/usuario/criar").permitAll()
 
-                        .requestMatchers("/api/transacao/**", "/api/carteira/**").hasAnyAuthority("LOJISTA", "CLIENTE")
+
                         .requestMatchers(HttpMethod.POST, "/api/transacao/transferir").hasAuthority("CLIENTE")
+                        .requestMatchers("/api/transacao/**", "/api/carteira/**").hasAnyAuthority("LOJISTA", "CLIENTE")
+
+
+                        .requestMatchers("/api/chave-pix/**").authenticated()
 
                         .anyRequest().permitAll()
                 )
@@ -92,6 +98,10 @@ public class SecurityConfig {
                 .addFilterBefore(
                         jwtFilter,
                         UsernamePasswordAuthenticationFilter.class
+                )
+                .addFilterAfter(
+                        rateLimitFilter,
+                        JwtFilter.class
                 )
 
                 .build();

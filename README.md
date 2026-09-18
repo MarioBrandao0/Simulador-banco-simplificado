@@ -400,17 +400,11 @@ Algumas das melhorias planejadas são:
 - [x] Persistência com banco de dados
 - [x] PostgreSQL
 - [x] Spring Data JPA
-- [ ] Chaves Pix
-- [ ] Extrato com paginação e filtros
-- [ ] Comprovantes de transferência
-- [ ] Idempotência em transferências
+- [x] Chaves Pix
 - [ ] Limites de transferência
 - [ ] Rate limiting
 - [ ] Testes unitários e de integração
-- [ ] Testcontainers
 - [ ] Documentação OpenAPI / Swagger
-- [ ] Auditoria de operações
-
 ---
 
 ## Status do projeto

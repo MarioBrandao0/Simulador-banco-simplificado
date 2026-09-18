@@ -1,5 +1,6 @@
 package com.banco.basico.simulador.usuario.api.dto;
 
+import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.br.CPF;
 
 import com.banco.basico.simulador.usuario.domain.TipoUsuario;
@@ -25,7 +26,7 @@ public record DtoUsuario(
         @Size(min = 5, message = "A senha deve ter pelo menos 5 caracteres")
         String senha,
 
-        @NotBlank(message = "O tipo de usuário é obrigatorio")
+        @NotNull(message = "O tipo de usuário é obrigatorio")
         TipoUsuario tipoUsuario
 
 ) {

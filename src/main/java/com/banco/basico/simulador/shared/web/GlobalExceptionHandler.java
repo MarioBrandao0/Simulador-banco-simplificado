@@ -1,5 +1,6 @@
 package com.banco.basico.simulador.shared.web;
 
+import com.banco.basico.simulador.carteira.domain.exception.UsuarioComCarteiraException;
 import com.banco.basico.simulador.shared.web.dto.DtoError;
 import com.banco.basico.simulador.carteira.domain.exception.CarteiraNaoEncontradaException;
 import com.banco.basico.simulador.integracao.autorizador.client.exception.ServicoIndisponivelException;
@@ -38,7 +39,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             CpfExistenteException.class,
-            EmailExistenteException.class
+            EmailExistenteException.class,
+            UsuarioComCarteiraException.class
     })
     public ResponseEntity<DtoError> handleRecursoExistente(RuntimeException e) {
         DtoError dtoError = new DtoError(HttpStatus.CONFLICT, e.getMessage());

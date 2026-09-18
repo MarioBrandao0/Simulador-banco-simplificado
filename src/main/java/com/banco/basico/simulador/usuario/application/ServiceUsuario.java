@@ -1,6 +1,8 @@
 package com.banco.basico.simulador.usuario.application;
 
+import com.banco.basico.simulador.carteira.application.ServiceCarteira;
 import com.banco.basico.simulador.carteira.domain.Carteira;
+import com.banco.basico.simulador.shared.web.dto.ApiResponse;
 import com.banco.basico.simulador.usuario.domain.Usuario;
 import com.banco.basico.simulador.usuario.api.dto.DtoResponseUsuario;
 import com.banco.basico.simulador.usuario.api.dto.DtoUsuario;
@@ -9,9 +11,11 @@ import com.banco.basico.simulador.usuario.domain.exception.EmailExistenteExcepti
 import com.banco.basico.simulador.usuario.domain.exception.UsuarioNaoEncontradoException;
 import com.banco.basico.simulador.usuario.infrastructure.persistence.RepositoryUsuario;
 import com.banco.basico.simulador.usuario.application.NormalizadorDadosUsuarios;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -30,33 +34,42 @@ public class ServiceUsuario {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private ServiceCarteira serviceCarteira;
 
     @CacheEvict(value = "todosOsUsuarios", allEntries = true)
+    @Transactional
     public void salvarUsuario(DtoUsuario dtoUsuario) {
-        emailExiste(dtoUsuario.email());
-        cpfExiste(dtoUsuario.cpf());
+        String emailNormalizado = normalizador.normalizarEmail(dtoUsuario.email());
+        String cpfNormalizado = normalizador.normalizarCpf(dtoUsuario.cpf());
+
+        emailExiste(emailNormalizado);
+        cpfExiste(cpfNormalizado);
 
         String senhaConvertida = passwordEncoder.encode(dtoUsuario.senha());
 
         Usuario novoUsuario = new Usuario(
-                normalizador.normalizarCpf(dtoUsuario.cpf()),
+                cpfNormalizado,
                 dtoUsuario.nome(),
-                normalizador.normalizarEmail(dtoUsuario.email()),
+                emailNormalizado,
                 senhaConvertida,
                 dtoUsuario.tipoUsuario()
         );
-        Carteira carteira = new Carteira();
 
-        novoUsuario.setCarteira(carteira);
+        serviceCarteira.cadastrarCarteira(novoUsuario);
         repositoryUsuario.save(novoUsuario);
 
     }
 
 
     @Cacheable("todosOsUsuarios")
-    public List<DtoResponseUsuario> listarTodos() {
-        return new ArrayList<>(repositoryUsuario.findAll()).stream()
-                .map(DtoResponseUsuario::converter).toList();
+    public ApiResponse<List<DtoResponseUsuario>> listarTodos() {
+        List<DtoResponseUsuario> usuarios = repositoryUsuario.findAll()
+                .stream()
+                .map(DtoResponseUsuario::converter)
+                .toList();
+
+        return new ApiResponse<>(HttpStatus.OK, usuarios);
     }
 
 

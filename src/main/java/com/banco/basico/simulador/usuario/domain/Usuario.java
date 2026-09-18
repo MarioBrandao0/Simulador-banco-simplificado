@@ -1,7 +1,6 @@
 package com.banco.basico.simulador.usuario.domain;
 
-import com.banco.basico.simulador.carteira.domain.Carteira;
-import com.banco.basico.simulador.usuario.domain.TipoUsuario;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,7 +22,7 @@ public class Usuario {
     String cpf;
     @Column(nullable = false)
     String nome;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     String email;
     @Column(nullable = false)
     String senha;
@@ -31,20 +30,12 @@ public class Usuario {
     @Column(nullable = false)
     TipoUsuario tipoUsuario;
 
-    @OneToOne(cascade = CascadeType.ALL, optional = false)
-    @JoinColumn(name = "carteira_id",nullable = false, unique = true)
-    Carteira carteira;
-
     public Usuario(String cpf, String nome, String email, String senha, TipoUsuario tipoUsuario) {
         this.cpf = cpf;
         this.nome = nome;
         this.email = email;
         this.senha = senha;
         this.tipoUsuario = tipoUsuario;
-    }
-
-    public void inserirCarteira(Carteira carteira){
-        this.carteira = carteira;
     }
 
     @Override

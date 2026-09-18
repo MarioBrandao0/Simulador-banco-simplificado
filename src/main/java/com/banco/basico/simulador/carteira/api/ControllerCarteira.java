@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/carteira")
+@RequestMapping("/api/carteiras")
 
 public class ControllerCarteira {
     ServiceCarteira serviceCarteira;
@@ -19,7 +19,7 @@ public class ControllerCarteira {
         this.serviceCarteira = serviceCarteira;
     }
 
-    @GetMapping("/saldo")
+    @GetMapping()
     public ResponseEntity<?> consultarSaldo(@AuthenticationPrincipal UsuarioAutenticado authentication) {
         return ResponseEntity.ok().body(serviceCarteira.consultarSaldo(authentication.id()));
     }

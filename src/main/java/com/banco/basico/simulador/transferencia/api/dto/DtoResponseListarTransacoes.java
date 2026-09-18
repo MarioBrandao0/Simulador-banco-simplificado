@@ -1,5 +1,7 @@
 package com.banco.basico.simulador.transferencia.api.dto;
 
+import com.banco.basico.simulador.transferencia.domain.Transacao;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -12,4 +14,13 @@ public record DtoResponseListarTransacoes(
     LocalDate data,
     LocalTime hora
 ) {
+    public static DtoResponseListarTransacoes converter(Transacao t) {
+        return new DtoResponseListarTransacoes(
+                t.getRemetente().getNome(),
+                t.getValor(),
+                t.getDestinatario().getNome(),
+                t.getData(),
+                t.getHora()
+        );
+    }
 }
